@@ -21,7 +21,7 @@ public class Coord {
     //     return other.x == x && other.y == y;
     // }
 
-    // Newly added below
+    // Paul - Newly added below, allows us to use the .contain()
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

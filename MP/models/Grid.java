@@ -2,10 +2,12 @@ package models;
 
 import java.util.Set;
 
-import javax.lang.model.util.ElementScanner6;
+
 
 import java.util.HashSet;
 
+
+import colorPrint.Paint;
 
 public class Grid {
     // Set of all coordinates in the grid
@@ -108,6 +110,24 @@ public class Grid {
         }
     }
 
+
+    // ERASE THIS IF UPDATE DECORATION - Just display the content of the grid
+    public static void displayGrid(String[][] grid)
+    {
+        for (int i = 1; i <= 9; i++) {
+            
+            for (int j = 1; j <= 18; j++) {
+
+                System.out.print(grid[i][j]);
+            }
+
+            System.out.println();
+        }
+
+
+    }
+
+    // ERASE THIS IF UPDATE DECORATION - Empties the grid and displays it as well
     public static void drawGrid(String[][] grid){
 
         System.out.print("\033[1;33m        L     C      R\033[0m");
@@ -186,7 +206,8 @@ public class Grid {
     }
     // If you wanna revers this process just call the function above which should reset and display
     // Newly added just draw a box, might need parameter if want to put coordinate
-    public static void drawAndSetGrid(String[][] grid, int peg, Coord pos, boolean isPlayer1)
+    // ERASE THIS FOR NEW DECORATION - the string updates based on input, displays it as well
+    public static void drawAndSetGrid(String[][] grid, int peg, Coord pos, boolean isPlayerA)
     {
 
         System.out.print("\033[1;33m        L     C      R\033[0m");
@@ -234,17 +255,17 @@ public class Grid {
                         
                         // Labelling with colors
                         // We follow what the specs seem to indicate (1,1) in programming sense is top left
-                        if(isPlayer1 && pos.getY() == (j/6+1) &&    // +1 because we aint starting at index 0 
+                        if(isPlayerA && pos.getY() == (j/6+1) &&    // +1 because we aint starting at index 0 
                            pos.getX() == (i/3+1))
                         {
                             
-                            grid[i][j] = "\033[1;36m" + peg + "\033[0m";
+                            grid[i][j] = Paint.paintTextCyan(Integer.toString(peg));
                             System.out.print(grid[i][j]);
                         }
-                        else if (!isPlayer1 && pos.getY() == (j/6+1) &&
+                        else if (!isPlayerA && pos.getY() == (j/6+1) &&
                                  pos.getX() == (i/3+1))
                         {
-                            grid[i][j] = "\033[1;31m" + peg + "\033[0m";
+                            grid[i][j] = Paint.paintTextOrange(Integer.toString(peg));
                             System.out.print(grid[i][j]);
 
                         }
