@@ -155,7 +155,7 @@ public class MP {
             if (winner == Winner.PLAYER_A) {
                 playerBLives -= 1;
                 Blives[0] = playerBLives;
-            } else {
+            } else if (winner == Winner.PLAYER_B){
                 playerALives -= 1;
                 Alives[0] = playerALives;
             }
@@ -202,8 +202,15 @@ public class MP {
 
             else {
                 System.out.println();
-        
-                Paint.paintRoundWinner(winner.getResponse());
+                if(winner == Winner.NONE)
+                {
+                    System.out.println(winner.getResponse());
+                    System.out.println(Paint.paintTextYellow("DRAW! has occured, no one gets anything."));
+                }else{
+                    Paint.paintRoundWinner(winner.getResponse());
+                }
+                
+                
                 System.out.println();
                 System.out.println();
                 System.out.println(Paint.paintTextGreen("Updated Scores Below: "));

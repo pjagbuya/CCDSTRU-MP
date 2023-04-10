@@ -408,7 +408,7 @@ public class GAME {
             PlayerB_Wins = true;
             System.out.println("A DRAW HAS OCCURED! Lives remain the same");
         }
-        displayLives(Alives, Blives);
+
         pause = new PAUSE();
         
         
