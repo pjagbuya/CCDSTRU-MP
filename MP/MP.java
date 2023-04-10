@@ -313,7 +313,7 @@ public class MP {
                 
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputA.getPeg(), playerInputA.getPos());
-                if (isInvalidMove){
+                if (isInvalidMove) {
                     System.out.println(
                         Paint.paintTextRed(
                             "ERROR! Invalid value of "+ playerInputA.getPeg() + 
@@ -323,12 +323,11 @@ public class MP {
                     );
                     pause = new PAUSE();
                     isInvalidMove = false;
-
+                } else {
+                    // Check if player B won
+                    over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
+                    winner = GameOver(over);
                 }
-
-                // Check if player A won
-                over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
-                winner = GameOver(over);
             }
 
             // Only activate when it is player B's turn
@@ -344,7 +343,7 @@ public class MP {
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputB.getPeg(), playerInputB.getPos());
 
-                if(isInvalidMove){
+                if(isInvalidMove) {
                     System.out.println(
                         Paint.paintTextRed(
                             "ERROR! Invalid value of "+ playerInputB.getPeg() + 
@@ -354,17 +353,12 @@ public class MP {
                     );
                     pause = new PAUSE();
                     isInvalidMove = false;
+                } else {
+                    // Check if player B won
+                    over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
+                    winner = GameOver(over);
                 }
-
-
-                // Check if player B won
-                over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
-                winner = GameOver(over);
-            }
-
-       
-
-            
+            }            
         }
         
 
