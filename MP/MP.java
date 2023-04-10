@@ -170,7 +170,7 @@ public class MP {
                 // Clear screen and display the result
                 cls = new CLS();
 
-                // Checks player's input and displays what happens on screen
+                // Checks player's input and displays what happens on screen, also displays the result on screen
                 NextPlayerMove(playerInputB.getPeg(), playerInputB.getPos());
 
 
@@ -192,9 +192,9 @@ public class MP {
 
 
                  // Pause for the player to process what happened
-                Paint.turnOnYellow();
+
                 pause = new PAUSE();
-                Paint.turnOffColor();
+
                 
                 System.out.println();
                 System.out.println("New Game? (Y/N): ");
@@ -400,6 +400,7 @@ public class MP {
 
             // Displays player score
             displayPlayerPts();
+
         }
 
         // OK when peg is a number not chosen, pos, a space not occupied
