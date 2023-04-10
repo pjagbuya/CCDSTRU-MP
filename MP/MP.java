@@ -160,12 +160,18 @@ public class MP {
                 Alives[0] = playerALives;
             }
 
-            
+        
 
             // Congratulatory menu when one ofe the player's lives are done
             if (playerALives == 0 || playerBLives == 0) {
                 // ERASE THIS IF UPDATE DECORATION:
                 // System Congratulates Winner ASCII art
+                System.out.println();
+                System.out.println();
+                System.out.println(Paint.paintTextGreen("Updated Score List: "));
+                System.out.println();
+                displayPlayerPts(playerALives, playerBLives);
+                System.out.println();
                 Paint.paintWinner(winner.getResponse());
     
                 // Pause for the player to process what happened
