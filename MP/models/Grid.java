@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 
 import colorPrint.Paint;
+import screenRender.ScreenRenderer;
 
 public class Grid {
     // Set of all coordinates in the grid
@@ -210,8 +211,8 @@ public class Grid {
     public static void drawAndSetGrid(String[][] grid, int peg, Coord pos, boolean isPlayerA)
     {
 
-        System.out.print("\033[1;33m        L     C      R\033[0m");
-   
+        // System.out.print("\033[1;33m        L     C      R\033[0m");
+        
         System.out.println();
         
         for (int i = 1; i <= 9; i++) {
@@ -220,37 +221,37 @@ public class Grid {
             for (int j = 1; j <= 18; j++) {
 
                 // Labelling
-                if (i == 2 && j == 1)
-                {
-                    System.out.print("\033[1;33m  T   \033[0m"); 
-                }
-                else if (i == 5 && j == 1)
-                {
-                    System.out.print("\033[1;33m  M   \033[0m"); 
-                }
-                else if (i == 8 && j == 1)
-                {
-                    System.out.print("\033[1;33m  B   \033[0m"); 
-                }
-                else if ((i % 3 == 1 || i % 3 == 0) && j == 1)
-                {
-                    // Spacing accuracy
-                    System.out.print("      "); 
-                }
+                // if (i == 2 && j == 1)
+                // {
+                //     System.out.print("\033[1;33m  T   \033[0m"); 
+                // }
+                // else if (i == 5 && j == 1)
+                // {
+                //     System.out.print("\033[1;33m  M   \033[0m"); 
+                // }
+                // else if (i == 8 && j == 1)
+                // {
+                //     System.out.print("\033[1;33m  B   \033[0m"); 
+                // }
+                // else if ((i % 3 == 1 || i % 3 == 0) && j == 1)
+                // {
+                //     // Spacing accuracy
+                //     System.out.print("      "); 
+                // }
                 
                 // Middle layer of a box
                 if (i % 3 ==  2)
                 {   
                     
 
-                    if (j % 6 == 1 || j % 6 == 0)
-                    {
-                        // Ends of a box
+                    // if (j % 6 == 1 || j % 6 == 0)
+                    // {
+                    //     // Ends of a box
      
-                        System.out.print(grid[i][j]);
-                    }
+                    //     // System.out.print(grid[i][j]);
+                    // }
                     // Content in the middle
-                    else if (j % 6 == 3)
+                    if (j % 6 == 3)
                     {
                         
                         // Labelling with colors
@@ -260,42 +261,43 @@ public class Grid {
                         {
                             
                             grid[i][j] = Paint.paintTextCyan(Integer.toString(peg));
-                            System.out.print(grid[i][j]);
+                            // System.out.print(grid[i][j]);
                         }
                         else if (!isPlayerA && pos.getY() == (j/6+1) &&
                                  pos.getX() == (i/3+1))
                         {
                             grid[i][j] = Paint.paintTextOrange(Integer.toString(peg));
-                            System.out.print(grid[i][j]);
+                            // System.out.print(grid[i][j]);
 
                         }
-                        else
-                        {
-                            System.out.print(grid[i][j]);
-                        }
+                        // else
+                        // {
+                        //     pass
+                        //     // System.out.print(grid[i][j]);
+                        // }
                        
 
 
                     }
                     
                     // Put empty or free
-                    else
-                    {
-                        // Space in a box
-                        System.out.print(" ");
-                    }
+                    // else
+                    // {
+                    //     // Space in a box
+                    //     // System.out.print(" ");
+                    // }
                 }
-                else 
-                {
-                    System.out.print(grid[i][j]);
-                }
+                // else 
+                // {
+                //     // System.out.print(grid[i][j]);
+                // }
                     
 
                 
                 
             }
 
-            System.out.println();
+            // System.out.println();
         }
 
     }
