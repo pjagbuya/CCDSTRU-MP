@@ -1,38 +1,27 @@
-// import java.util.List; - unused
 import java.util.Set;
 import java.util.HashSet;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Scanner;
-// https://github.com/pjagbuya/CCDSTRU-MP.git
+
+// Model Classes
 import Input.PlayerInput;
 import models.Coord;
+import models.GAME;
 import models.Grid;
+import models.Winner;
 
+// Prettifying Classes
+import colorPrint.Paint; 
+import SysControls.*;  
 
-import colorPrint.Paint;    // Paul - Painting text tools are here
-import SysControls.*;       // Paul - PAUSE and CLS are here
+// NOTE: 
+// Each coordinate is defined as (row, col) or (y, x) to be akin to array
+// indexing. Hence, (2, 1) is the cell at row 2 and column 1 and not the
+// other way around.
 
 public class MP {
-
-    enum Winner {
-
-        // Modified to add some color
-        PLAYER_A(Paint.paintTextCyan("A wins")),
-        PLAYER_B(Paint.paintTextOrange("B wins")),
-        NONE("No winner");
-
-        private String response;
-
-        Winner(String response) {
-            this.response = response;
-        }
-
-        String getResponse() {
-            return response;
-        }
-    }
-
     /* All positive integers less than 10 */
     static Set<Integer> P = initP();
 
@@ -53,283 +42,219 @@ public class MP {
     static Set<Coord> Occ = new HashSet<Coord>();
 
     /* Numbers placed in each row */
-    static Set<Integer> one = new HashSet<Integer>(); // Row 1
-    static Set<Integer> two = new HashSet<Integer>(); // Row 2
-    static Set<Integer> three = new HashSet<Integer>(); // Row 3
+    static Set<Integer> One = new HashSet<Integer>(); // Row 1
+    static Set<Integer> Two = new HashSet<Integer>(); // Row 2
+    static Set<Integer> Three = new HashSet<Integer>(); // Row 3
 
     /* Numbers placed in each column */
-    static Set<Integer> four = new HashSet<Integer>(); // Column 1
-    static Set<Integer> five = new HashSet<Integer>(); // Column 2
-    static Set<Integer> six = new HashSet<Integer>(); // Column 3
+    static Set<Integer> Four = new HashSet<Integer>(); // Column 1
+    static Set<Integer> Five = new HashSet<Integer>(); // Column 2
+    static Set<Integer> Six = new HashSet<Integer>(); // Column 3
 
     /*
-     * Indicates if a turn can proceed, i.e. the number to be placed has not been
-     * placed yet
+     * Indicates if a turn can proceed, i.e. the number to be placed has not
+     * been placed yet
      */
     static boolean ok = false;
 
     /*
-     * Indicates if a number can be placed on the grid, i.e. the space to be placed
-     * on is not occupied yet
+     * Indicates if a number can be placed on the grid, i.e. the space to be 
+     * placed on is not occupied yet
      */
     static boolean next = false;
-
-    /* Player A's turn if true, Player B's turn otherwise */
+    
+    /*
+     * Player A's turn if true, Player B's turn otherwise
+     */
     static boolean turn = true;
 
-    // ERASE THIS IF UPDATE DECORATION - 10 x 19 string 2d string because we will be working on 1-18, so less hassle calcs
+    /*
+     * Indicates whether the game is currently over
+     */
+    static boolean over = true;
+
+    // ERASE THIS IF UPDATE DECORATION:
+    // 10 x 19 string 2d string because we will be working on 1-18, so less
+    // hassle calcs
     static String[][] gridArray = new String[10][19];
 
+    /*
+     * Free - the set of grid coordinates which don't have a number yet
+     */
+    static Set<Coord> getFree() {
+        Set<Coord> Free = new HashSet<Coord>(S);
+        Free.removeAll(Occ);
 
-   // CLARIFICATIONS - added a throw for my CLS class para maclear console print sa terminal
-    public static void main(String[] args) throws IOException, InterruptedException {
-    
+        return Free;
+    }
 
+    /*
+     * Peg - the numbers which have not yet been placed on the grid
+     */
+    static Set<Integer> getPeg() {
+        Set<Integer> numbersInSets = new HashSet<Integer>();
+        numbersInSets.addAll(One);
+        numbersInSets.addAll(Two);
+        numbersInSets.addAll(Three);
+        numbersInSets.addAll(Four);
+        numbersInSets.addAll(Five);
+        numbersInSets.addAll(Six);
 
+        Set<Integer> Peg = new HashSet<Integer>(P);
+        Peg.removeAll(numbersInSets);
 
+        return Peg;
+    }
+
+    // MAIN //
+
+    static int playerALives = 3;
+    static int playerBLives = 3;
+
+    static boolean decideGame() {
+        // Idk if this is a uniform 60-40 split but it should work anyway
+        return new Random().nextInt(100) < 60;
+    }
+
+    // Added a throw for the CLS class para maclear console print sa terminal.
+    static Winner startGridGame() throws IOException, InterruptedException {
+        resetGridVars();
         
-        
-        // SET Initialize all the Coordinates and store them in a set
-        initRowAndColSets();
-
-        // SET -Set that the winner is stil no one
-        Winner winner = Winner.NONE;
-
-        
-         // Added playerB here but since there is a next player func i think we can cancel this
-         PlayerInput playerInputB;
-         PlayerInput playerInputA;
-
-        // Moved variable declarations outside the while loop
-        boolean over = false;
-
-
-        // Scanner if user wants to go for more rounds
-        Scanner sc_Continue = new Scanner(System.in);
-
-        // Clears screen ptext
-        CLS cls = new CLS();
-
-        // Pause for the player to process what happened
-        PAUSE pause;
-
-        // ERASE THIS IF UPDATE DECORATION - Draws and display an empty array
+        // ERASE THIS IF UPDATE DECORATION:
+        // Draws and display an empty array
         boolean isOnceDraw = false;
 
+        // Clears screen text
+        CLS cls = new CLS();
 
-        // Place holder label for player 1
-        System.out.println(Paint.paintTextCyan("Player A: 0"));
+        // Added playerB here but since there is a next player func 
+        // i think we can cancel this
+        PlayerInput playerInputB;
+        PlayerInput playerInputA;
 
-        // Placeholder label for player 2
-        System.out.println(Paint.paintTextOrange("Player B: 0"));
-        System.out.println();
-
+        Winner winner = Winner.NONE;
         while (winner == Winner.NONE) {
-            // `pos` refers to the coordinate in which to place the number `peg`
-            // on the grid.
-            
-
-            // ERASE THIS IF UPDATE DECORATION - Draws and display an empty array
-            if (!isOnceDraw){
+            // ERASE THIS IF UPDATE DECORATION:
+            // Draws and display an empty array
+            if (!isOnceDraw) {
                 Grid.drawGrid(gridArray);
+                displayPlayerPts(playerALives, playerBLives);
                 isOnceDraw = true;
             }
-            
 
-
-            /* Only activate when it is player A's turn
-             * Only activate when there is no Winner
-             */
-            if (turn && winner == Winner.NONE){
-
-                
+            // Only activate when it is player A's turn
+            if (turn) {   
                 // Prompt Player A for input
                 playerInputA = PlayerInput.promptInput(turn);
 
                 // Ready screen and display the result
                 cls = new CLS();
+                
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputA.getPeg(), playerInputA.getPos());
-
 
                 // Check if player A won
                 over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
                 winner = GameOver(over);
             }
-      
-            
-            /* Only activate when it is player B's turn
-             * Only activate when there is no Winner
-             */
-            else if(!turn && winner == Winner.NONE)
-            {
 
+            // Only activate when it is player B's turn
+            else {
                 // Checks input for B
                 playerInputB = PlayerInput.promptInput(turn);
 
                 // Clear screen and display the result
                 cls = new CLS();
 
-                // Checks player's input and displays what happens on screen, also displays the result on screen
+                // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputB.getPeg(), playerInputB.getPos());
 
-
-                 //Check if player B won
+                // Check if player B won
                 over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
                 winner = GameOver(over);
-                
+            }
+        }
+
+        return winner;        
+    }
+
+    static Winner startRiddleGame() throws IOException, InterruptedException {
+        return GAME.Riddle(playerALives, playerBLives);
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {        
+        initRowAndColSets();
+
+        // Clears screen text
+        CLS cls;
+        // Pause for the player to process what happened
+        PAUSE pause;
+
+        // Scanner if user wants to go for more rounds
+        Scanner sc_Continue = new Scanner(System.in);
+
+        boolean firstGame = true;
+
+        while (true) {
+            Winner winner = Winner.NONE;
+
+            if (firstGame || decideGame()) {
+                winner = startGridGame();
+            } else {
+                winner = startRiddleGame();
             }
 
+            firstGame = false;
 
-            // If a player wins, congratulate and prompt for more
-            if(over){
-                // ERASE THIS IF UPDATE DECORATION - System Congratulates Winner ASCII art
+            if (winner == Winner.PLAYER_A) {
+                playerBLives -= 1;
+            } else {
+                playerALives -= 1;
+            }
+
+            if (playerALives == 0 || playerBLives == 0) {
+                // ERASE THIS IF UPDATE DECORATION:
+                // System Congratulates Winner ASCII art
                 Paint.paintWinner(winner.getResponse());
-                // System responds with who is the winner
-                System.out.println();
-                System.out.println(winner.getResponse());
-                System.out.println();
 
-
-                 // Pause for the player to process what happened
-
+                // Pause for the player to process what happened
+                Paint.turnOnYellow();
                 pause = new PAUSE();
-
+                Paint.turnOffColor();
                 
                 System.out.println();
                 System.out.println("New Game? (Y/N): ");
 
                 String isContinue = sc_Continue.nextLine();
-                if (isContinue.contains("Y") || isContinue.contains("y")){
-                    // Reset all values
-                    winner = Winner.NONE;
-                    over = false;
-                    // Activate to draw again
-                    isOnceDraw = false;
-                    resetAllGlobal();
-                    
-                    // Initialize all rows and cols
-                    initRowAndColSets();
-
-                    // Ready screen for next
+                if (isContinue.contains("Y") || isContinue.contains("y")) {
                     cls = new CLS();
-                    
-                    
+
+                    playerALives = 3;
+                    playerBLives = 3;
+                    firstGame = true;
+                } else {
+                    System.out.println(
+                        "GOODBYE! JAA NE! SAYONARA! ADIOS! MATA NEE! BID ADIEU! BAIBAI! PAALAM! THANK YOU!");
+                    break;
                 }
+            } else {
+                System.out.println();
+                System.out.println(winner.getResponse());
+                System.out.println();
 
-                // Exit the loop and goodbye
-                else{
-                    System.out.println("GOODBYE! JAA NE! SAYONARA! ADIOS! MATA NEE! BID ADIEU! BAIBAI! PAALAM! THANK YOU!");
+                // TODO: display current score standings
 
-                }
-
+                System.out.println("Press enter to move to the next round.");
+                sc_Continue.nextLine();
             }
-
-
-
-           
         }
-        sc_Continue.close();
-
-
-
-
-
-    }
-
-    
-    
-    static void resetAllGlobal(){
-
-        /* All positive integers less than 10 */
-        P = initP();
-
-        /* All coordinates in the grid */
-        S = initS();
-
-        /* All coordinates in each row */
-        T = new HashSet<>(); // Row 1
-        M = new HashSet<>(); // Row 2
-        B = new HashSet<>(); // Row 3
-
-        /* All coordinates in each column */
-        L = new HashSet<>(); // Column 1
-        C = new HashSet<>(); // Column 2
-        R = new HashSet<>(); // Column 3
-
-        /* Grid coordinates which aleady have a number */
-        Occ = new HashSet<Coord>();
-
-        /* Numbers placed in each row */
-        one = new HashSet<Integer>(); // Row 1
-        two = new HashSet<Integer>(); // Row 2
-        three = new HashSet<Integer>(); // Row 3
-
-        /* Numbers placed in each column */
-        four = new HashSet<Integer>(); // Column 1
-        five = new HashSet<Integer>(); // Column 2
-        six = new HashSet<Integer>(); // Column 3
-
-        /*
-        * Indicates if a turn can proceed, i.e. the number to be placed has not been
-        * placed yet
-        */
-        ok = false;
-
-        /*
-        * Indicates if a number can be placed on the grid, i.e. the space to be placed
-        * on is not occupied yet
-        */
-        next = false;
-
-        /* Player A's turn if true, Player B's turn otherwise */
-        turn = true;
-
-        // ERASE THIS IF UPDATE DECORATION - 10 x 19 string 2d string because we will be working on 1-18, so less hassle calcs
-        gridArray = new String[10][19];
-    }
-
-
-    /* Grid coordinates which don't have a number yet */
-    static Set<Coord> getFree() {
-
-        // original below
-        // Set<Coord> Free = new HashSet<Coord>(Occ);
-
         
-        // Free.removeAll(S);
-
-
-        // CLARIFICATIONS - Paul here, Modified the block above, I think baliktad yung original
-        Set<Coord> Free = new HashSet<Coord>(S);
-        Free.removeAll(Occ);
-        return Free;
+        sc_Continue.close();
     }
 
-    /* Numbers which have not yet been placed on the grid */
-    static Set<Integer> getPeg() {
-
-        Set<Integer> numbersInSets = new HashSet<Integer>();
-        numbersInSets.addAll(one);
-        numbersInSets.addAll(two);
-        numbersInSets.addAll(three);
-        numbersInSets.addAll(four);
-        numbersInSets.addAll(five);
-        numbersInSets.addAll(six);
-
-        Set<Integer> Peg = new HashSet<Integer>(P);
-        Peg.removeAll(numbersInSets);
-
-
-    
-        return Peg;
-    }
-
-
-    // Main Methods //
+    // MAIN METHODS //
 
     static Winner GameOver(boolean over) {
-
         if (over) {
             if (turn) {
                 if (hasRowOrColumnSumLessThan15())
@@ -348,126 +273,99 @@ public class MP {
         }
     }
 
-
-
-    // TO BE MODIFIED - modify/add parameters to this so that the players can update their score
-    static void displayPlayerPts(){
-        // ERASE THIS IF UPDATE DECORATION - Place holder label for player 1
-        System.out.println(Paint.paintTextCyan("Player A: 0"));
-        // ERASE THIS IF UPDATE DECORATION - Placeholder label for player 2
-        System.out.println(Paint.paintTextOrange("Player B: 0"));
-        System.out.println();
-
-    }
-
-    // ERASE THIS IF UPDATE DECORATION - Function void updates the drawing
-    static void setGrid_BasedOnMove(int peg, Coord pos)
-    {
-        // ERASE THIS IF UPDATE DECORATION - The visual indicator of the move, need to update this based on NextPlayerMove
-        Grid.drawAndSetGrid(gridArray, peg, pos, turn);
-        displayPlayerPts();
-
-    }
-
-    // START - NEXT PLAYER CONTROL - START
     static void NextPlayerMove(int peg, Coord pos) {
-
-        
-        
         Set<Integer> Peg = getPeg();
         Set<Coord> Free = getFree();
 
-        // Paul - Should initialize this every time it calls right
-        boolean ok = false;
-
-
-        
-
-        // TODO: contains won't work with pos (I think), probably need another method
-        // CLARIFICATIONS - contains should work na, overriden the hashCode() and equals()
         if (Peg.contains(peg) && Free.contains(pos)) {
             ok = true;
             Occ.add(pos);
 
             // Draws the table if the move is valid
             setGrid_BasedOnMove(peg, pos);
-        }
-        // Add input validation feedback
-        else{
+        } else {
             Grid.displayGrid(gridArray);
-            System.out.println(Paint.paintTextRed("ERROR! Invalid value of "+ peg + " and/or invalid coordinates of " + 
-            "(" + pos.getX() + ", " + pos.getY() + ")." ));
-
-            // Displays player score
-            displayPlayerPts();
-
+            System.out.println(
+                Paint.paintTextRed(
+                    "ERROR! Invalid value of "+ peg + 
+                    " and/or invalid coordinates of " + 
+                    "(" + pos.getX() + ", " + pos.getY() + ")."
+                )
+            );
         }
 
-        // OK when peg is a number not chosen, pos, a space not occupied
+        displayPlayerPts(playerALives, playerBLives);
 
-        // TODO: use Set.contains() instead of the below since it
-        // "cannot find symbol"
-
-        // also don't forget to access indiv coords when checking since
-        // the sets don't contain coords
-        // NEWLY MODIFIED, modified the Coord.java and overriden the hashCode() and equals() func, so contains should work na
+        // Following the flow indicated in the specs, if a number `peg` has
+        // not been used yet:
         if (ok) {
-
+            // Check if it can be placed in the row indicated by `pos`,
             if (T.contains(pos)) {
-
-                one.add(peg);
+                One.add(peg);
+                next = !next;
+            } else if (M.contains(pos)) {
+                Two.add(peg);
+                next = !next;
+            } else {
+                Three.add(peg);
                 next = !next;
             }
-
-            else if (M.contains(pos))
-             {
-                two.add(peg);
-                next = !next;
-            }
-
-            else {
-                three.add(peg);
-                next = !next;
-            }
-
-            // START - IF - START
+            
+            // And if so, place it in the column set as well.
             if (next) {
-                if (L.contains(pos)) 
-                {
-                    four.add(peg);
+                if (L.contains(pos)) {
+                    Four.add(peg);
                     next = !next;
                     ok = !ok;
-                }
-                 else if (C.contains(pos)) {
-                    five.add(peg);
+                } else if (C.contains(pos)) {
+                    Five.add(peg);
                     next = !next;
                     ok = !ok;
                 } else {
-                    six.add(peg);
+                    Six.add(peg);
                     next = !next;
                     ok = !ok;
                 }
-
             }
-            // END - IF - END
-
         }
-
     }
-    // END - NEXT PLAYER CONTROL - END
 
     // Helper Methods //
 
-    /* Corresponds to the second condition for `over`. */
+    // TO BE MODIFIED:
+    // modify/add parameters to this so that the players can update their score
+    static void displayPlayerPts(int playerAScore, int playerBScore) {
+        // ERASE THIS IF UPDATE DECORATION:
+        // Place holder label for player 1
+        System.out.println(Paint.paintTextCyan("Player A: " + playerAScore));
+
+        // ERASE THIS IF UPDATE DECORATION:
+        // Placeholder label for player 2
+        System.out.println(Paint.paintTextOrange("Player B: " + playerBScore));
+
+        System.out.println();
+    }
+
+    // ERASE THIS IF UPDATE DECORATION:
+    // Function void updates the drawing
+    static void setGrid_BasedOnMove(int peg, Coord pos)
+    {
+        // ERASE THIS IF UPDATE DECORATION:
+        // The visual indicator of the move, need to update this based on
+        // NextPlayerMove
+        Grid.drawAndSetGrid(gridArray, peg, pos, turn);
+    }
+
+    /*
+     * Corresponds to the second condition for `over`.
+     */
     static boolean allRowOrColumnSumsEqual15() {
-
-
-        return ((one.size() == 3 && sumSet(one) == 15) &&
-                (two.size() == 3 && sumSet(two) == 15) &&
-                (three.size() == 3 && sumSet(three) == 15) &&
-                (four.size() == 3 && sumSet(four) == 15) &&
-                (five.size() == 3 && sumSet(five) == 15) &&
-                (six.size() == 3 && sumSet(six) == 15));
+        return ((One.size() == 3 && sumSet(One) == 15) &&
+                (Two.size() == 3 && sumSet(Two) == 15) &&
+                (Three.size() == 3 && sumSet(Three) == 15) &&
+                (Four.size() == 3 && sumSet(Four) == 15) &&
+                (Five.size() == 3 && sumSet(Five) == 15) &&
+                (Six.size() == 3 && sumSet(Six) == 15));
     }
 
     static void initRowAndColSets() {
@@ -500,21 +398,21 @@ public class MP {
                 new Coord(3, 3)));
     }
 
-    /* Corresponds to the first condition for `over`. */
+    /*
+     * Corresponds to the first condition for `over`.
+     */
     static boolean hasRowOrColumnSumLessThan15() {
-
-        return ((one.size() == 3 && sumSet(one) < 15) ||
-                (two.size() == 3 && sumSet(two) < 15) ||
-                (three.size() == 3 && sumSet(three) < 15) ||
-                (four.size() == 3 && sumSet(four) < 15) ||
-                (five.size() == 3 && sumSet(five) < 15) ||
-                (six.size() == 3 && sumSet(six) < 15));
+        return ((One.size() == 3 && sumSet(One) < 15) ||
+                (Two.size() == 3 && sumSet(Two) < 15) ||
+                (Three.size() == 3 && sumSet(Three) < 15) ||
+                (Four.size() == 3 && sumSet(Four) < 15) ||
+                (Five.size() == 3 && sumSet(Five) < 15) ||
+                (Six.size() == 3 && sumSet(Six) < 15));
     }
 
     static Set<Integer> initP() {
         Set<Integer> P = new HashSet<>();
         
-        // NEWLY MODIFIED - Peg should only contain 1 - 9
         for (int i = 1; i < 10; i++) {
             P.add(i);
         }
@@ -525,9 +423,9 @@ public class MP {
     static Set<Coord> initS() {
         Set<Coord> S = new HashSet<>();
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                S.add(new Coord(i + 1, j + 1));
+        for (int i = 1; i <= 3; i++) {
+            for (int j = 1; j <= 3; j++) {
+                S.add(new Coord(i, j));
             }
         }
 
@@ -544,5 +442,34 @@ public class MP {
         return sum;
     }
 
-}
+    static void resetGridVars() {
+        P = initP();
+        S = initS();
 
+        T = new HashSet<>();
+        M = new HashSet<>();
+        B = new HashSet<>();
+
+        L = new HashSet<>();
+        C = new HashSet<>();
+        R = new HashSet<>();
+
+        Occ = new HashSet<Coord>();
+
+        One = new HashSet<Integer>();
+        Two = new HashSet<Integer>();
+        Three = new HashSet<Integer>();
+
+        Four = new HashSet<Integer>();
+        Five = new HashSet<Integer>();
+        Six = new HashSet<Integer>();
+
+        ok = false;
+        next = false;
+        turn = true;
+        over = false;
+
+        // ERASE THIS IF UPDATE DECORATION:
+        gridArray = new String[10][19];
+    }
+}
