@@ -86,8 +86,10 @@ public class GAME {
         }
 
         if(PlayerA_Wins && !PlayerB_Wins){
+            Alives[0] += 1;
             return Winner.PLAYER_A;
         }else if (PlayerB_Wins && !PlayerA_Wins){
+            Blives[0] += 1;
             return Winner.PLAYER_B;
         }else{
             return Winner.NONE;
@@ -99,13 +101,13 @@ public class GAME {
     private static void returnRes(int Twice, int[] Alives,int[] Blives, boolean isAWin){
 
         if (Twice == 2 && isAWin == true){
-            Alives[0] += 1;
+            
             PlayerA_Wins = true;
             
         }
 
         else if (Twice == 1 && isAWin == true){
-            Blives[0] += 1;
+
             PlayerB_Wins = true;
         }
 
@@ -156,8 +158,9 @@ public class GAME {
         randomNumber = lowerBound + secureRandom.nextInt(upperBound-lowerBound);
         origNum = randomNumber;
 
-        isAWin = false;
+        
         while(Twice > 0){
+            isAWin = false;
             cls = new CLS();
             Design();
             System.out.println("LIVES COUNT: ");
@@ -199,6 +202,7 @@ public class GAME {
                     System.out.println("2, 6, 12, 20, 30 ... What is the 10th term?");
                     System.out.println("Input: ");
                     nAns = sc.nextInt();
+                    sc.nextLine();  // New line gets taken
             
                     if (nAns ==  111)
                         {
@@ -219,7 +223,7 @@ public class GAME {
                     System.out.println("2, 4, 8, 10, 20, 22 ... What is the next term?");
                     System.out.println("Input: ");
                     nAns = sc.nextInt();
-            
+                    sc.nextLine();  // New line gets taken
                     if (nAns ==  44)
                         {
                             Paint.turnOnGreen();
@@ -239,7 +243,7 @@ public class GAME {
                     System.out.println("If three times a number is equal to the number subtracted from 30, what is the number?");
                     System.out.println("Input: ");
                     fAns = sc.nextFloat();
-            
+                    sc.nextLine();  // New line gets taken
                     if (fAns ==  7.5)
                         {
                             Paint.turnOnGreen();
@@ -259,7 +263,7 @@ public class GAME {
                     System.out.println("The sum of a number and its double is 18. What is the number?");
                     System.out.println("Input: ");
                     nAns = sc.nextInt();
-            
+                    sc.nextLine();  // New line gets taken
                     if (nAns ==  6)
                         {
                             Paint.turnOnGreen();
@@ -400,6 +404,8 @@ public class GAME {
             returnRes(1, Alives, Blives, true);
         }
         else{
+            PlayerA_Wins = true;
+            PlayerB_Wins = true;
             System.out.println("A DRAW HAS OCCURED! Lives remain the same");
         }
         displayLives(Alives, Blives);
