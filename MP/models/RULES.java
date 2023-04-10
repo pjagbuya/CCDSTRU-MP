@@ -59,7 +59,7 @@ public class RULES {
         displayTitle();
         System.out.println();
         System.out.println();
-        System.out.println("\t1.) The game is Called Fifth Fact Foe, Both player start with three lives, labels are \033[1;36mPlayer A\033[0m and \033[1;38;5;202mPlayer B\033[0m");
+        System.out.println("\t1.) The game is Called SUD-XO, Both player start with three lives, labels are \033[1;36mPlayer A\033[0m and \033[1;38;5;202mPlayer B\033[0m");
         System.out.println();
         System.out.println("\t2.) Every game round, players are subjected to a 3x3 table labeled with the following coordinates");
         System.out.println();
