@@ -12,6 +12,8 @@ import models.Grid;
 
 import colorPrint.Paint;    // Paul - Painting text tools are here
 import SysControls.*;       // Paul - PAUSE and CLS are here
+import screenRender.Colors;
+import screenRender.ScreenRenderer;
 
 public class MP {
 
@@ -79,16 +81,20 @@ public class MP {
 
     // ERASE THIS IF UPDATE DECORATION - 10 x 19 string 2d string because we will be working on 1-18, so less hassle calcs
     static String[][] gridArray = new String[10][19];
+    static char[][] newGridArray = new char[10][19];
+    static int[][] gridColors = new int[10][19];
+    static String errorMessage = "";
 
+    static ScreenRenderer renderer;
 
    // CLARIFICATIONS - added a throw for my CLS class para maclear console print sa terminal
     public static void main(String[] args) throws IOException, InterruptedException {
-    
+        renderer = new ScreenRenderer(96, 30, 4, 3, Colors.GREEN);
+        for (int i = 0; i < newGridArray.length; i++) {
+            Arrays.fill(newGridArray[i], ' ');
+            Arrays.fill(gridColors[i], 0);
+        }
 
-
-
-        
-        
         // SET Initialize all the Coordinates and store them in a set
         initRowAndColSets();
 
@@ -118,20 +124,27 @@ public class MP {
 
 
         // Place holder label for player 1
-        System.out.println(Paint.paintTextCyan("Player A: 0"));
+        //System.out.println(Paint.paintTextCyan("Player A: 0"));
 
         // Placeholder label for player 2
-        System.out.println(Paint.paintTextOrange("Player B: 0"));
-        System.out.println();
+        //System.out.println(Paint.paintTextOrange("Player B: 0"));
+        //System.out.println();
 
         while (winner == Winner.NONE) {
+            renderer.initScreen(Colors.GREEN);
+            initScreen();
+            if(errorMessage.length() != 0) {
+                renderer.setPixels(60, 11, errorMessage, Colors.RED);
+            }
+
             // `pos` refers to the coordinate in which to place the number `peg`
             // on the grid.
             
 
             // ERASE THIS IF UPDATE DECORATION - Draws and display an empty array
             if (!isOnceDraw){
-                Grid.drawGrid(gridArray);
+                Grid.drawGrid(gridArray, newGridArray);
+                renderGame();
                 isOnceDraw = true;
             }
             
@@ -142,9 +155,9 @@ public class MP {
              */
             if (turn && winner == Winner.NONE){
 
-                
+
                 // Prompt Player A for input
-                playerInputA = PlayerInput.promptInput(turn);
+                playerInputA = PlayerInput.promptInput(turn,  renderer, 10, 11);
 
                 // Ready screen and display the result
                 cls = new CLS();
@@ -165,7 +178,7 @@ public class MP {
             {
 
                 // Checks input for B
-                playerInputB = PlayerInput.promptInput(turn);
+                playerInputB = PlayerInput.promptInput(turn, renderer, 10, 11);
 
                 // Clear screen and display the result
                 cls = new CLS();
@@ -287,6 +300,11 @@ public class MP {
 
         // ERASE THIS IF UPDATE DECORATION - 10 x 19 string 2d string because we will be working on 1-18, so less hassle calcs
         gridArray = new String[10][19];
+        newGridArray = new char[10][19];
+        for (int i = 0; i < newGridArray.length; i++) {
+            Arrays.fill(newGridArray[i], ' ');
+            Arrays.fill(gridColors[i], 0);
+        }
     }
 
 
@@ -364,9 +382,9 @@ public class MP {
     static void setGrid_BasedOnMove(int peg, Coord pos)
     {
         // ERASE THIS IF UPDATE DECORATION - The visual indicator of the move, need to update this based on NextPlayerMove
-        Grid.drawAndSetGrid(gridArray, peg, pos, turn);
+        Grid.drawAndSetGrid(gridArray, newGridArray, gridColors, peg, pos, turn);
         displayPlayerPts();
-
+        renderGame();
     }
 
     // START - NEXT PLAYER CONTROL - START
@@ -391,12 +409,18 @@ public class MP {
 
             // Draws the table if the move is valid
             setGrid_BasedOnMove(peg, pos);
+            errorMessage = new String();
         }
         // Add input validation feedback
         else{
-            Grid.displayGrid(gridArray);
-            System.out.println(Paint.paintTextRed("ERROR! Invalid value of "+ peg + " and/or invalid coordinates of " + 
-            "(" + pos.getX() + ", " + pos.getY() + ")." ));
+            Grid.displayGrid(gridArray, newGridArray);
+            errorMessage = new String("ERROR! Invalid value of \n"+ peg + " and/or invalid coordinates of\n" +
+                    "(" + pos.getX() + ", " + pos.getY() + ").");
+
+            renderGame();
+
+            //System.out.println(Paint.paintTextRed("ERROR! Invalid value of "+ peg + " and/or invalid coordinates of " +
+            //"(" + pos.getX() + ", " + pos.getY() + ")." ));
 
             // Displays player score
             displayPlayerPts();
@@ -544,5 +568,94 @@ public class MP {
         return sum;
     }
 
+    static void initScreen() {
+        //Constant numbers represent positions in the screen
+        String header = "" +
+                "░░██╗░░░░░░░██╗░██████╗██╗░░░██╗██████╗░░░░░░░██╗░░██╗░█████╗░██╗░░░░░░░██╗░░\n" +
+                "░██╔╝░░██╗░░██║██╔════╝██║░░░██║██╔══██╗░░░░░░╚██╗██╔╝██╔══██╗██║░░██╗░░╚██╗░\n" +
+                "██╔╝░██████╗██║╚█████╗░██║░░░██║██║░░██║█████╗░╚███╔╝░██║░░██║██║██████╗░╚██╗\n" +
+                "╚██╗░╚═██╔═╝╚═╝░╚═══██╗██║░░░██║██║░░██║╚════╝░██╔██╗░██║░░██║╚═╝╚═██╔═╝░██╔╝\n" +
+                "░╚██╗░░╚═╝░░██╗██████╔╝╚██████╔╝██████╔╝░░░░░░██╔╝╚██╗╚█████╔╝██╗░░╚═╝░░██╔╝░\n" +
+                "░░╚═╝░░░░░░░╚═╝╚═════╝░░╚═════╝░╚═════╝░░░░░░░╚═╝░░╚═╝░╚════╝░╚═╝░░░░░░░╚═╝░░";
+
+        String p1Turn =
+                "█▀█ █░░ ▄▀█ █▄█ █▀▀ █▀█   ▄▀█ ▀ █▀   ▀█▀ █░█ █▀█ █▄░█\n" +
+                        "█▀▀ █▄▄ █▀█ ░█░ ██▄ █▀▄   █▀█ ░ ▄█   ░█░ █▄█ █▀▄ █░▀█";
+
+        String p2Turn = "█▀█ █░░ ▄▀█ █▄█ █▀▀ █▀█   █▄▄ ▀ █▀   ▀█▀ █░█ █▀█ █▄░█\n" +
+                "█▀▀ █▄▄ █▀█ ░█░ ██▄ █▀▄   █▄█ ░ ▄█   ░█░ █▄█ █▀▄ █░▀█";
+
+        if(!turn) {
+            renderer.setPixels(21, 8, p1Turn, Colors.CYAN);
+        } else {
+            renderer.setPixels(21, 8, p2Turn, Colors.ORANGE);
+        }
+        renderer.setPixels(9, 1, header, Colors.ORANGE);
+        renderer.createHorizontalLine(22, 3, Colors.GREEN);
+        renderer.createVerticalLine(44, 24, 4, 7, Colors.GREEN);
+        renderer.setPixels(38, 10, newGridArray, Colors.OFF_COLOR);
+        //Score of players
+        renderScore(99, 99);
+
+        for (int i = 0; i < gridColors.length; i++) {
+            for (int j = 0; j < gridColors[i].length; j++) {
+                Colors color = gridColors[i][j] == 1? Colors.CYAN : gridColors[i][j] == -1 ? Colors.ORANGE : Colors.OFF_COLOR;
+                renderer.setColorOfPixel(38 + j, 10 + i, color);
+            }
+        }
+    }
+
+    static void renderGame() {
+        initScreen();
+        renderer.renderScreen();
+    }
+
+    static void renderScore(int playerAScore, int playerBScore) {
+        String p1 =
+                "▒█▀▀█ █░░ █░░█ █▀▀█   ░█▀▀█ ▄ \n" +
+                "▒█▄▄█ █░░ █▄▄█ █▄▄▀   ▒█▄▄█ ░ \n" +
+                "▒█░░░ ▀▀▀ ▄▄▄█ ▀░▀▀   ▒█░▒█ ▀";
+
+        String p2 =
+                "▒█▀▀█ █░░ █░░█ █▀▀█   ▒█▀▀█ ▄ \n" +
+                "▒█▄▄█ █░░ █▄▄█ █▄▄▀   ▒█▀▀▄ ░ \n" +
+                "▒█░░░ ▀▀▀ ▄▄▄█ ▀░▀▀   ▒█▄▄█ ▀";
+
+        renderer.setPixels(1, 26, p1, Colors.CYAN);
+        renderer.setPixels(31, 26, intToAsciiArt(playerAScore), Colors.CYAN);
+        renderer.setPixels(50, 26, p2, Colors.ORANGE);
+        renderer.setPixels(80, 26, intToAsciiArt(playerBScore), Colors.ORANGE);
+    }
+
+    static String intToAsciiArt(int number) {
+        StringBuilder[] finalArt = new StringBuilder[3];
+        String[] numbers =
+                ("█▀▀█ ▄█░ █▀█ █▀▀█ ░█▀█░ █▀▀ ▄▀▀▄ ▀▀▀█ ▄▀▀▄ ▄▀▀▄ \n" +
+                 "█▄▀█ ░█░ ░▄▀ ░░▀▄ █▄▄█▄ ▀▀▄ █▄▄░ ░░█░ ▄▀▀▄ ▀▄▄█ \n" +
+                 "█▄▄█ ▄█▄ █▄▄ █▄▄█ ░░░█░ ▄▄▀ ▀▄▄▀ ░▐▌░ ▀▄▄▀ ░▄▄▀ ").split("\n");
+
+
+
+        int locations[] = {0, 5, 9, 13, 18, 24, 28, 33 ,38 ,43};
+        int width[] = {4, 3, 3, 4, 5, 3, 4, 4, 4, 4};
+
+        char[] nums = ("" + number).toCharArray();
+
+        for (int i = 0; i < 3; i++) {
+            finalArt[i] = new StringBuilder();
+        }
+
+
+        for (int i = 0; i < nums.length; i++) {
+            int startString = locations[Integer.parseInt("" + nums[i])];
+            int endString = startString + width[Integer.parseInt("" + nums[i])];
+            finalArt[0].append(numbers[0], startString, endString + 1);
+            finalArt[1].append(numbers[1], startString, endString + 1);
+            finalArt[2].append(numbers[2], startString, endString + 1);
+        }
+        finalArt[0].append("\n");
+        finalArt[1].append("\n");
+        return String.join("", finalArt);
+    }
 }
 
