@@ -2,12 +2,15 @@ import java.util.Set;
 import java.util.HashSet;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Scanner;
 
 // Model Classes
 import Input.PlayerInput;
 import models.Coord;
+import models.GAME;
 import models.Grid;
+import models.Winner;
 
 // Prettifying Classes
 import colorPrint.Paint; 
@@ -19,23 +22,6 @@ import SysControls.*;
 // other way around.
 
 public class MP {
-
-    enum Winner {
-        PLAYER_A(Paint.paintTextCyan("A wins")),
-        PLAYER_B(Paint.paintTextOrange("B wins")),
-        NONE("No winner");
-
-        private String response;
-
-        Winner(String response) {
-            this.response = response;
-        }
-
-        String getResponse() {
-            return response;
-        }
-    }
-
     /* All positive integers less than 10 */
     static Set<Integer> P = initP();
 
@@ -122,33 +108,29 @@ public class MP {
 
     // MAIN //
 
+    static int playerALives = 3;
+    static int playerBLives = 3;
+
+    static boolean decideGame() {
+        // Idk if this is a uniform 60-40 split but it should work anyway
+        return new Random().nextInt(100) < 60;
+    }
+
     // Added a throw for the CLS class para maclear console print sa terminal.
-    public static void main(String[] args) throws IOException, InterruptedException {
-        initRowAndColSets();
-
-        // Place holder label for player 1
-        System.out.println(Paint.paintTextCyan("Player A: 0"));
-
-        // Placeholder label for player 2
-        System.out.println(Paint.paintTextOrange("Player B: 0"));
-        System.out.println();
-
+    static Winner startGridGame() throws IOException, InterruptedException {
+        resetGridVars();
+        
         // ERASE THIS IF UPDATE DECORATION:
         // Draws and display an empty array
         boolean isOnceDraw = false;
 
-        // Clears screen ptext
+        // Clears screen text
         CLS cls = new CLS();
-        // Pause for the player to process what happened
-        PAUSE pause;
 
         // Added playerB here but since there is a next player func 
         // i think we can cancel this
         PlayerInput playerInputB;
         PlayerInput playerInputA;
-
-        // Scanner if user wants to go for more rounds
-        Scanner sc_Continue = new Scanner(System.in);
 
         Winner winner = Winner.NONE;
         while (winner == Winner.NONE) {
@@ -156,17 +138,18 @@ public class MP {
             // Draws and display an empty array
             if (!isOnceDraw) {
                 Grid.drawGrid(gridArray);
+                displayPlayerPts(playerALives, playerBLives);
                 isOnceDraw = true;
             }
-            
+
             // Only activate when it is player A's turn
-            // Only activate when there is no Winner
-            if (turn && winner == Winner.NONE) {   
+            if (turn) {   
                 // Prompt Player A for input
                 playerInputA = PlayerInput.promptInput(turn);
 
                 // Ready screen and display the result
                 cls = new CLS();
+                
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputA.getPeg(), playerInputA.getPos());
 
@@ -174,10 +157,9 @@ public class MP {
                 over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
                 winner = GameOver(over);
             }
-      
+
             // Only activate when it is player B's turn
-            // Only activate when there is no Winner
-            else if (!turn && winner == Winner.NONE) {
+            else {
                 // Checks input for B
                 playerInputB = PlayerInput.promptInput(turn);
 
@@ -187,21 +169,53 @@ public class MP {
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputB.getPeg(), playerInputB.getPos());
 
-                //Check if player B won
+                // Check if player B won
                 over = hasRowOrColumnSumLessThan15() || allRowOrColumnSumsEqual15();
                 winner = GameOver(over);
             }
+        }
 
-            // If a player wins, congratulate and prompt for more
-            if (over) {
+        return winner;        
+    }
+
+    static Winner startRiddleGame() throws IOException, InterruptedException {
+        return GAME.Riddle(playerALives, playerBLives);
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {        
+        initRowAndColSets();
+
+        // Clears screen text
+        CLS cls;
+        // Pause for the player to process what happened
+        PAUSE pause;
+
+        // Scanner if user wants to go for more rounds
+        Scanner sc_Continue = new Scanner(System.in);
+
+        boolean firstGame = true;
+
+        while (true) {
+            Winner winner = Winner.NONE;
+
+            if (firstGame || decideGame()) {
+                winner = startGridGame();
+            } else {
+                winner = startRiddleGame();
+            }
+
+            firstGame = false;
+
+            if (winner == Winner.PLAYER_A) {
+                playerBLives -= 1;
+            } else {
+                playerALives -= 1;
+            }
+
+            if (playerALives == 0 || playerBLives == 0) {
                 // ERASE THIS IF UPDATE DECORATION:
                 // System Congratulates Winner ASCII art
                 Paint.paintWinner(winner.getResponse());
-
-                // System responds with who is the winner
-                System.out.println();
-                System.out.println(winner.getResponse());
-                System.out.println();
 
                 // Pause for the player to process what happened
                 Paint.turnOnYellow();
@@ -213,24 +227,25 @@ public class MP {
 
                 String isContinue = sc_Continue.nextLine();
                 if (isContinue.contains("Y") || isContinue.contains("y")) {
-                    // Reset all values
-                    winner = Winner.NONE;
-                    over = false;
-                    // Activate to draw again
-                    isOnceDraw = false;
-                    resetAllGlobal();
-                    
-                    // Initialize all rows and cols
-                    initRowAndColSets();
-
-                    // Ready screen for next
                     cls = new CLS();
-                }
 
-                // Exit the loop and goodbye
-                else {
-                    System.out.println("GOODBYE! JAA NE! SAYONARA! ADIOS! MATA NEE! BID ADIEU! BAIBAI! PAALAM! THANK YOU!");
+                    playerALives = 3;
+                    playerBLives = 3;
+                    firstGame = true;
+                } else {
+                    System.out.println(
+                        "GOODBYE! JAA NE! SAYONARA! ADIOS! MATA NEE! BID ADIEU! BAIBAI! PAALAM! THANK YOU!");
+                    break;
                 }
+            } else {
+                System.out.println();
+                System.out.println(winner.getResponse());
+                System.out.println();
+
+                // TODO: display current score standings
+
+                System.out.println("Press enter to move to the next round.");
+                sc_Continue.nextLine();
             }
         }
         
@@ -277,9 +292,9 @@ public class MP {
                     "(" + pos.getX() + ", " + pos.getY() + ")."
                 )
             );
-
-            displayPlayerPts();
         }
+
+        displayPlayerPts(playerALives, playerBLives);
 
         // Following the flow indicated in the specs, if a number `peg` has
         // not been used yet:
@@ -319,14 +334,14 @@ public class MP {
 
     // TO BE MODIFIED:
     // modify/add parameters to this so that the players can update their score
-    static void displayPlayerPts(){
+    static void displayPlayerPts(int playerAScore, int playerBScore) {
         // ERASE THIS IF UPDATE DECORATION:
         // Place holder label for player 1
-        System.out.println(Paint.paintTextCyan("Player A: 0"));
+        System.out.println(Paint.paintTextCyan("Player A: " + playerAScore));
 
         // ERASE THIS IF UPDATE DECORATION:
         // Placeholder label for player 2
-        System.out.println(Paint.paintTextOrange("Player B: 0"));
+        System.out.println(Paint.paintTextOrange("Player B: " + playerBScore));
 
         System.out.println();
     }
@@ -339,7 +354,6 @@ public class MP {
         // The visual indicator of the move, need to update this based on
         // NextPlayerMove
         Grid.drawAndSetGrid(gridArray, peg, pos, turn);
-        displayPlayerPts();
     }
 
     /*
@@ -428,7 +442,7 @@ public class MP {
         return sum;
     }
 
-    static void resetAllGlobal() {
+    static void resetGridVars() {
         P = initP();
         S = initS();
 
