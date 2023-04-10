@@ -47,21 +47,21 @@ public class PlayerInput {
 
         CLS cls = new CLS();
         Colors color = turn ? Colors.CYAN : Colors.ORANGE;
-        renderer.setPixels(posX, posY, "Input coord x(1 - 3):", color);
+        renderer.setPixels(posX, posY, "Input row no. (1 - 3):", color);
         renderer.renderScreen();
         renderer.setTextCursor(posX , posY + 1);
         x = scanner.nextInt();
         renderer.setPixels(posX, posY + 1, x, color);
 
         cls = new CLS();
-        renderer.setPixels(posX, posY + 2, "Input coord y(1 - 3):", color);
+        renderer.setPixels(posX, posY + 2, "Input col no. (1 - 3):", color);
         renderer.renderScreen();
         renderer.setTextCursor(posX , posY + 3);
         y = scanner.nextInt();
         renderer.setPixels(posX, posY + 3, y, color);
 
         cls = new CLS();
-        renderer.setPixels(posX, posY + 4, "Input value(1 -9 ):", color);
+        renderer.setPixels(posX, posY + 4, "Input value (1 - 9):", color);
         renderer.renderScreen();
         renderer.setTextCursor(posX , posY + 5);
         value = scanner.nextInt();
