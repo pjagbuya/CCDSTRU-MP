@@ -99,4 +99,28 @@ public class Paint {
 
 
     }
+
+
+    public static void paintRoundWinner(String sText){
+        if (sText.contains("A")) {
+            turnOnCyan();
+            System.out.println(" █████      ██     ██ ██ ███    ██ ███████ ");
+            System.out.println("██   ██     ██     ██ ██ ████   ██ ██      ");
+            System.out.println("███████     ██  █  ██ ██ ██ ██  ██ ███████ ");
+            System.out.println("██   ██     ██ ███ ██ ██ ██  ██ ██      ██ ");
+            System.out.println("██   ██      ███ ███  ██ ██   ████ ███████ ");
+            System.out.println("                                           ");
+            turnOffColor();
+        }
+        else{
+            turnOnOrange();
+            System.out.println("██████      ██     ██ ██ ███    ██ ███████ ");
+            System.out.println("██   ██     ██     ██ ██ ████   ██ ██      ");
+            System.out.println("██████      ██  █  ██ ██ ██ ██  ██ ███████ ");
+            System.out.println("██   ██     ██ ███ ██ ██ ██  ██ ██      ██ ");
+            System.out.println("██████       ███ ███  ██ ██   ████ ███████ ");
+            System.out.println("                                           ");
+            turnOffColor();
+        }
+    }
 }

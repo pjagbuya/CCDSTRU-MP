@@ -59,7 +59,7 @@ public class RULES {
         displayTitle();
         System.out.println();
         System.out.println();
-        System.out.println("\t1.) The game is Called Fifth Fact Foe, Both player start with three lives, labels are \033[1;36mPlayer A\033[0m and \033[1;38;5;202mPlayer B\033[0m");
+        System.out.println("\t1.) The game is Called SUD-XO, Both player start with three lives, labels are \033[1;36mPlayer A\033[0m and \033[1;38;5;202mPlayer B\033[0m");
         System.out.println();
         System.out.println("\t2.) Every game round, players are subjected to a 3x3 table labeled with the following coordinates");
         System.out.println();
@@ -81,9 +81,10 @@ public class RULES {
         System.out.println();
         System.out.println("\t8.) The Game Will End Once a Player's life runs out.");
         System.out.println();
-        System.out.println("\t9.) Whenever a round ends, there is a chance to have a random challenge/riddle/question that could help either player to be at an \033[1;32mADVANTAGE\033[0m or \033[1;31mDISADVANTAGE\033[0m");
+        System.out.println("\t9.) Whenever a round ends, there is a chance to have a RANDOM challenge/riddle/question that could help either player to be at an \033[1;32mADVANTAGE\033[0m or \033[1;31mDISADVANTAGE\033[0m");
         System.out.println();
-
+        System.out.println("\t10.) Draws in these random challenges Mean NO WINNERS, NO advantages given, NO disadvantages given.");
+        System.out.println();
 
         System.out.println();
         pause = new PAUSE();
