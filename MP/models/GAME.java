@@ -15,6 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.lang.model.util.ElementScanner6;
 
 import java.security.SecureRandom;
+import models.Winner;
 
 
 
@@ -37,16 +38,44 @@ public class GAME {
     static Scanner sc = new Scanner(System.in);
     static SecureRandom secureRandom = new SecureRandom();
 
+    static boolean PlayerA_Wins = false;
+    static boolean PlayerB_Wins = false;
+
+
+    private static void AlertPlayer(){
+        Paint.turnOnRed();
+        System.out.println("           (            (              ");
+        System.out.println("   (       )\\ )         )\\ )    *   )  ");
+        System.out.println("   )\\     (()/(   (    (()/(  ` )  /(  ");
+        System.out.println("((((_)(    /(_))  )\\    /(_))  ( )(_)) ");
+        System.out.println(" )\\ _ )\\  (_))   ((_)  (_))   (_(_())  ");
+        System.out.println(" (_)_\\(_) | |    | __| | _ \\  |_   _|  ");
+        System.out.println("  / _ \\   | |__  | _|  |   /    | |    ");
+        System.out.println(" /_/ \\_\\  |____| |___| |_|_\\    |_|    ");
+        Paint.turnOffColor();
+        System.out.println();
+        System.out.println();
+        System.out.println(Paint.paintTextYellow("GAME ROUND! TO SPICE THINGS UP A LITTLE"));
+        
+
+
+
+    }
     
    // CLARIFICATIONS - added a throw for my CLS class para maclear console print sa terminal
-    public static void game(int[] Alives, int[] Blives) throws IOException, InterruptedException {
+    public static Winner game(int[] Alives, int[] Blives) throws IOException, InterruptedException {
         
 
         // Generates a random number
         // randomNumber = lowerBound + secureRandom.nextInt(upperBound-lowerBound);
+        //
+
+
 
         randomNumber = secureRandom.nextInt(8);
 
+        AlertPlayer();
+        PAUSE pause = new PAUSE();
 
         // Two game modes to be tossed around for chacne 67:33 is the probability Riddle:HighLow, Uncomment and apply randomizer
         if (randomNumber % 3 == 0){    
@@ -56,8 +85,14 @@ public class GAME {
             Riddle(Alives, Blives);
         }
 
+        if(PlayerA_Wins && !PlayerB_Wins){
+            return Winner.PLAYER_A;
+        }else if (PlayerB_Wins && !PlayerA_Wins){
+            return Winner.PLAYER_B;
+        }else{
+            return Winner.NONE;
+        }
         
-
 
         
     }
@@ -65,20 +100,15 @@ public class GAME {
 
         if (Twice == 2 && isAWin == true){
             Alives[0] += 1;
+            PlayerA_Wins = true;
             
         }
-        else if (Twice == 2 && isAWin == false){
-            Alives[0] -= 1;
-            
-        }
+
         else if (Twice == 1 && isAWin == true){
             Blives[0] += 1;
-            
+            PlayerB_Wins = true;
         }
-        else if(Twice == 1 && isAWin == false){
-            Blives[0] -= 1;
-            
-        }
+
     }
     private static void displayPlayerTurn(int Twice){
         if(Twice == 2){
@@ -342,7 +372,7 @@ public class GAME {
 
         // Display result
         if(nCountG_A < nCountG_B){
-
+            PlayerA_Wins = true;
             System.out.println();
             System.out.println(Paint.paintTextCyan("Player A has guessed less with "+ nCountG_A +
             " times, while player B guessed " + nCountG_B + " times"));
@@ -354,7 +384,10 @@ public class GAME {
             returnRes(1, Alives, Blives, false);
         }
         else if (nCountG_B < nCountG_A){
+            
+            PlayerB_Wins = true;
             System.out.println();
+
             System.out.println(Paint.paintTextOrange("Player B has guessed less with "+ nCountG_B +
             " times, while player A guessed " + nCountG_A + " times"));
             System.out.println(Paint.paintTextOrange("PLAYER B WINS LIVES!"));

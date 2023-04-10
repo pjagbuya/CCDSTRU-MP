@@ -2,7 +2,7 @@ package models;
 
 import java.util.Set;
 
-
+import javax.lang.model.util.ElementScanner6;
 
 import java.util.HashSet;
 
@@ -112,13 +112,38 @@ public class Grid {
 
 
     // ERASE THIS IF UPDATE DECORATION - Just display the content of the grid
-    public static void displayGrid(String[][] grid)
+    public static void displayGrid(String[][] grid, char[][] newGrid)
     {
+        System.out.println();
+        System.out.println("\033[1;33m        L     C      R\033[0m");
+
         for (int i = 1; i <= 9; i++) {
             
             for (int j = 1; j <= 18; j++) {
+                // Labelling
+                if (i == 2 && j == 1)
+                {
+                    System.out.print("\033[1;33m  T   \033[0m|");
+                }
+                else if (i == 5 && j == 1)
+                {
+                    System.out.print("\033[1;33m  M   \033[0m|");
+                }
+                else if (i == 8 && j == 1)
+                {
+                    System.out.print("\033[1;33m  B   \033[0m|");
+                }
+                else if ((i % 3 == 1 || i % 3 == 0) && j == 1)
+                {
+                    // Spacing accuracy
+                    System.out.print("      |");
+                }
+                else{
+                    if(j != 1)
+                        System.out.print(grid[i][j]);
+                }
 
-                System.out.print(grid[i][j]);
+                
             }
 
             System.out.println();
@@ -128,11 +153,11 @@ public class Grid {
     }
 
     // ERASE THIS IF UPDATE DECORATION - Empties the grid and displays it as well
-    public static void drawGrid(String[][] grid){
+    public static void drawGrid(String[][] grid, char[][] newGrid){
 
-        System.out.print("\033[1;33m        L     C      R\033[0m");
+        // System.out.print("\033[1;33m        L     C      R\033[0m");
    
-        System.out.println();
+        //System.out.println();
         
         for (int i = 1; i <= 9; i++) {
             
@@ -142,26 +167,28 @@ public class Grid {
                 // Labelling
                 if (i == 2 && j == 1)
                 {
-                    System.out.print("\033[1;33m  T   \033[0m"); 
+                    //System.out.print("\033[1;33m  T   \033[0m");
                 }
                 else if (i == 5 && j == 1)
                 {
-                    System.out.print("\033[1;33m  M   \033[0m"); 
+                    //System.out.print("\033[1;33m  M   \033[0m");
                 }
                 else if (i == 8 && j == 1)
                 {
-                    System.out.print("\033[1;33m  B   \033[0m"); 
+                    //System.out.print("\033[1;33m  B   \033[0m");
                 }
                 else if ((i % 3 == 1 || i % 3 == 0) && j == 1)
                 {
                     // Spacing accuracy
-                    System.out.print("      "); 
+                    //System.out.print("      ");
                 }
 
                 if(i % 3 == 1)
                 {
                     grid[i][j] = "_";
-                    System.out.print("_");
+                    newGrid[i][j] = '═';
+
+                    //System.out.print("_");
                 }
                 else if (i % 3 ==  2)
                 {
@@ -171,14 +198,16 @@ public class Grid {
                     {
                         // Ends of a box
                         grid[i][j] = "|";
-                        System.out.print("|");
+                        newGrid[i][j] = '║';
+                        //System.out.print("|");
                     }
 
                     else
                     {
                         // Space in a box
                         grid[i][j] = " ";
-                        System.out.print(" ");
+                        newGrid[i][j] = ' ';
+                        //System.out.print(" ");
                     }
                 }
                 else if (i % 3 == 0)
@@ -186,12 +215,14 @@ public class Grid {
                     if(j % 6 == 1 || j % 6 == 0)
                     {
                         grid[i][j] = "+";
-                        System.out.print("+");
+                        newGrid[i][j] = '═';
+                        //System.out.print("+");
                     }
                     else
                     {
                         grid[i][j] = "-";
-                        System.out.print("-");
+                        newGrid[i][j] = '═';
+                        //System.out.print("-");
                     }
                 }
                     
@@ -200,19 +231,20 @@ public class Grid {
                 
             }
 
-            System.out.println();
+            //System.out.println();
         }
 
     }
     // If you wanna revers this process just call the function above which should reset and display
     // Newly added just draw a box, might need parameter if want to put coordinate
     // ERASE THIS FOR NEW DECORATION - the string updates based on input, displays it as well
-    public static void drawAndSetGrid(String[][] grid, int peg, Coord pos, boolean isPlayerA)
+    public static void drawAndSetGrid(String[][] grid, char[][] newGrid, int gridColor[][],
+                                      int peg, Coord pos, boolean isPlayerA)
     {
 
-        System.out.print("\033[1;33m        L     C      R\033[0m");
+        //System.out.print("\033[1;33m        L     C      R\033[0m");
    
-        System.out.println();
+        //System.out.println();
         
         for (int i = 1; i <= 9; i++) {
 
@@ -222,20 +254,20 @@ public class Grid {
                 // Labelling
                 if (i == 2 && j == 1)
                 {
-                    System.out.print("\033[1;33m  T   \033[0m"); 
+                    //System.out.print("\033[1;33m  T   \033[0m");
                 }
                 else if (i == 5 && j == 1)
                 {
-                    System.out.print("\033[1;33m  M   \033[0m"); 
+                    //System.out.print("\033[1;33m  M   \033[0m");
                 }
                 else if (i == 8 && j == 1)
                 {
-                    System.out.print("\033[1;33m  B   \033[0m"); 
+                    //System.out.print("\033[1;33m  B   \033[0m");
                 }
                 else if ((i % 3 == 1 || i % 3 == 0) && j == 1)
                 {
                     // Spacing accuracy
-                    System.out.print("      "); 
+                    //System.out.print("      ");
                 }
                 
                 // Middle layer of a box
@@ -247,7 +279,7 @@ public class Grid {
                     {
                         // Ends of a box
      
-                        System.out.print(grid[i][j]);
+                        //System.out.print(grid[i][j]);
                     }
                     // Content in the middle
                     else if (j % 6 == 3)
@@ -258,20 +290,23 @@ public class Grid {
                         if(isPlayerA && pos.getY() == (j/6+1) &&    // +1 because we aint starting at index 0 
                            pos.getX() == (i/3+1))
                         {
-                            
+                            newGrid[i][j] = (char) ('0' + peg);
+                            gridColor[i][j] = 1;
                             grid[i][j] = Paint.paintTextCyan(Integer.toString(peg));
-                            System.out.print(grid[i][j]);
+                            //System.out.print(grid[i][j]);
                         }
                         else if (!isPlayerA && pos.getY() == (j/6+1) &&
                                  pos.getX() == (i/3+1))
                         {
+                            newGrid[i][j] = (char) ('0' + peg);
+                            gridColor[i][j] = -1;
                             grid[i][j] = Paint.paintTextOrange(Integer.toString(peg));
-                            System.out.print(grid[i][j]);
+                            //System.out.print(grid[i][j]);
 
                         }
                         else
                         {
-                            System.out.print(grid[i][j]);
+                            //System.out.print(grid[i][j]);
                         }
                        
 
@@ -282,12 +317,12 @@ public class Grid {
                     else
                     {
                         // Space in a box
-                        System.out.print(" ");
+                        //System.out.print(" ");
                     }
                 }
                 else 
                 {
-                    System.out.print(grid[i][j]);
+                    //System.out.print(grid[i][j]);
                 }
                     
 
@@ -295,7 +330,7 @@ public class Grid {
                 
             }
 
-            System.out.println();
+            //System.out.println();
         }
 
     }
