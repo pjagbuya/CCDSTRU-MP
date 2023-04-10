@@ -45,14 +45,15 @@ public class GAME {
         // Generates a random number
         // randomNumber = lowerBound + secureRandom.nextInt(upperBound-lowerBound);
 
-        randomNumber = 1;
-        CLS cls = new CLS();
+        randomNumber = secureRandom.nextInt(8);
 
-        
-        if (randomNumber == 1){
-            // Two game modes to be tossed around for chacne 75:25 is the probability Riddle:HighLow, Uncomment and apply randomizer
-            // Riddle(Alives, Blives);
-            // playHighLow(Alives, Blives);
+
+        // Two game modes to be tossed around for chacne 67:33 is the probability Riddle:HighLow, Uncomment and apply randomizer
+        if (randomNumber % 3 == 0){    
+            playHighLow(Alives, Blives);
+        }
+        else{
+            Riddle(Alives, Blives);
         }
 
         
