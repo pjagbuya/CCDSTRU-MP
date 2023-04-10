@@ -137,6 +137,11 @@ public class MP {
         // Draws and display an empty array
         boolean isOnceDraw = false;
 
+        // Clears screen ptext
+        CLS cls = new CLS();
+        // Pause for the player to process what happened
+        PAUSE pause;
+
         // Added playerB here but since there is a next player func 
         // i think we can cancel this
         PlayerInput playerInputB;
@@ -161,7 +166,7 @@ public class MP {
                 playerInputA = PlayerInput.promptInput(turn);
 
                 // Ready screen and display the result
-                new CLS();
+                cls = new CLS();
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputA.getPeg(), playerInputA.getPos());
 
@@ -177,7 +182,7 @@ public class MP {
                 playerInputB = PlayerInput.promptInput(turn);
 
                 // Clear screen and display the result
-                new CLS();
+                cls = new CLS();
 
                 // Checks player's input and displays what happens on screen
                 NextPlayerMove(playerInputB.getPeg(), playerInputB.getPos());
@@ -200,7 +205,7 @@ public class MP {
 
                 // Pause for the player to process what happened
                 Paint.turnOnYellow();
-                new PAUSE();
+                pause = new PAUSE();
                 Paint.turnOffColor();
                 
                 System.out.println();
@@ -219,7 +224,7 @@ public class MP {
                     initRowAndColSets();
 
                     // Ready screen for next
-                    new CLS();
+                    cls = new CLS();
                 }
 
                 // Exit the loop and goodbye
