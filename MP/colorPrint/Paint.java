@@ -39,6 +39,19 @@ public class Paint {
     {
         return "\033[1;31m" + sText + "\033[0m";
     }
+    
+    public static String paintTextYellow(String sText)
+    {
+        return "\033[1;33m" + sText + "\033[0m";
+    }
+    public static String paintTextMagenta(String sText)
+    {
+        return "\033[1;35m" + sText + "\033[0m";
+    }
+    public static String paintTextGreen(String sText)
+    {
+        return "\033[1;32m" + sText + "\033[0m";
+    }
 
     public static void paintWinner(String sText)
     {

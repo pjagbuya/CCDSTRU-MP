@@ -11,6 +11,9 @@ import colorPrint.Paint;    // Paul - Painting text tools are here
 import SysControls.*;       // Paul - PAUSE and CLS are here
 
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.security.SecureRandom;
 
 
@@ -47,14 +50,42 @@ public class GAME {
 
         
         if (randomNumber == 1){
-            Riddle(Alives, Blives);
-
+            // Two game modes to be tossed around for chacne 75:25 is the probability Riddle:HighLow, Uncomment and apply randomizer
+            // Riddle(Alives, Blives);
+            // playHighLow(Alives, Blives);
         }
 
         
 
 
         
+    }
+    private static void returnRes(int Twice, int[] Alives,int[] Blives, boolean isAWin){
+
+        if (Twice == 2 && isAWin == true){
+            Alives[0] += 1;
+            
+        }
+        else if (Twice == 2 && isAWin == false){
+            Alives[0] -= 1;
+            
+        }
+        else if (Twice == 1 && isAWin == true){
+            Blives[0] += 1;
+            
+        }
+        else if(Twice == 1 && isAWin == false){
+            Blives[0] -= 1;
+            
+        }
+    }
+    private static void displayPlayerTurn(int Twice){
+        if(Twice == 2){
+            System.out.println(Paint.paintTextCyan("For Player A: "));
+        }
+        else if (Twice == 1){
+            System.out.println(Paint.paintTextOrange("For Player B: "));
+        }
     }
     public static void displayLives(int[] Alives, int[] Blives){
 
@@ -102,12 +133,9 @@ public class GAME {
             displayLives(Alives, Blives);
             System.out.println();
             System.out.println();
-            if(Twice == 2){
-                System.out.println(Paint.paintTextCyan("For Player A: "));
-            }
-            else if (Twice == 1){
-                System.out.println(Paint.paintTextOrange("For Player B: "));
-            }
+
+            displayPlayerTurn(Twice);
+            
             switch(randomNumber){
                 case 1:
                     System.out.println();
@@ -219,33 +247,130 @@ public class GAME {
             }
             PAUSE pause = new PAUSE();
 
-            if (Twice == 2 && isAWin == true){
-                Alives[0] += 1;
-                
-            }
-            else if (Twice == 2 && isAWin == false){
-                Alives[0] -= 1;
-                
-            }
-            else if (Twice == 1 && isAWin == true){
-                Blives[0] += 1;
-                
-            }
-            else if(Twice == 1 && isAWin == false){
-                Blives[0] -= 1;
-                
-            }
+            returnRes(Twice, Alives, Blives, isAWin);
 
 
             Twice--;
+
+            // Ensures next one is a unique and different num for the next player's question
             while(randomNumber == origNum){
                 randomNumber = lowerBound + secureRandom.nextInt(upperBound-lowerBound);
             }
+
         }
 
 
         
 
     }
+    private static void displayHighLowTitle(){
+
+        String art = "888    888      8888888       .d8888b.       888    888            .d88888b.  8888888b.            888            .d88888b.       888       888 \n" +
+                     "888    888        888        d88P  Y88b      888    888           d88P\" \"Y88b 888   Y88b           888           d88P\" \"Y88b      888   o   888 \n" +
+                     "888    888        888        888    888      888    888           888     888 888    888           888           888     888      888  d8b  888 \n" +
+                     "8888888888        888        888             8888888888           888     888 888   d88P           888           888     888      888 d888b 888 \n" +
+                     "888    888        888        888  88888      888    888           888     888 8888888P\"            888           888     888      888d88888b888 \n" +
+                     "888    888        888        888    888      888    888           888     888 888 T88b             888           888     888      88888P Y88888 \n" +
+                     "888    888        888        Y88b  d88P      888    888           Y88b. .d88P 888  T88b            888           Y88b. .d88P      8888P   Y8888 \n" +
+                     "888    888      8888888       \"Y8888P88      888    888            \"Y88888P\"  888   T88b           88888888       \"Y88888P\"       888P     Y888 \n";
+        
+        Paint.turnOnYellow();
+        System.out.println(art);
+        Paint.turnOffColor();
+    }
     
+    private static void returnUserGuesRes(int nNum, int nGuess){
+        PAUSE pause;
+        if (nGuess < nNum){
+            System.out.println(Paint.paintTextRed("Guess Higher!"));
+            System.out.println();
+        }
+        else if (nGuess > nNum){
+            System.out.println(Paint.paintTextMagenta("Guess Lower!"));
+            System.out.println();
+        }
+        else if (nGuess == nNum ){
+            System.out.println(Paint.paintTextGreen("You FOUND IT, " + nNum + "!"));
+            System.out.println();
+            pause = new PAUSE();
+        }
+    }
+    public static void playHighLow(int[] Alives, int[] Blives) throws IOException, InterruptedException{
+        int userNumber = -1;
+        int guessNumber;
+
+        int nCountG_A = 0;
+        int nCountG_B = 0;
+
+        
+        // 2 - means Plyaer A
+        // 1 - Means Player B
+        int Twice = 2;
+        PAUSE pause;
+        CLS cls = new CLS();
+        displayHighLowTitle();
+
+        while(Twice > 0){
+            guessNumber = 0 + secureRandom.nextInt(100);
+            System.out.println(Paint.paintTextYellow("Guess a number between (0-100), program will state higher or lower to help with your guess"));
+            System.out.println(Paint.paintTextYellow("The lesser prompts you take the more likely you get ahead of your opponent"));
+            System.out.println();
+            
+            displayPlayerTurn(Twice);
+            while( userNumber!= guessNumber){
+                if (Twice == 2){
+                    nCountG_A += 1;
+                }
+                else if (Twice == 1){
+                    nCountG_B += 1;
+                }
+                
+                System.out.print(Paint.paintTextYellow("User Input: "));
+                Paint.turnOnGreen();
+                userNumber = sc.nextInt();
+                Paint.turnOffColor();
+                returnUserGuesRes(guessNumber, userNumber);
+                
+            }
+
+
+            // Next player
+            Twice--;
+
+        }
+
+        // Display result
+        if(nCountG_A < nCountG_B){
+
+            System.out.println();
+            System.out.println(Paint.paintTextCyan("Player A has guessed less with "+ nCountG_A +
+            " times, while player B guessed " + nCountG_B + " times"));
+            System.out.println(Paint.paintTextCyan("PLAYER A WINS LIVES!"));
+            // A wins therefore add life
+            returnRes(2, Alives, Blives, true);
+
+            // B loses therefore minus life
+            returnRes(1, Alives, Blives, false);
+        }
+        else if (nCountG_B < nCountG_A){
+            System.out.println();
+            System.out.println(Paint.paintTextOrange("Player B has guessed less with "+ nCountG_B +
+            " times, while player A guessed " + nCountG_A + " times"));
+            System.out.println(Paint.paintTextOrange("PLAYER B WINS LIVES!"));
+
+
+            // A wins therefore add life
+            returnRes(2, Alives, Blives, false);
+
+            // B loses therefore minus life
+            returnRes(1, Alives, Blives, true);
+        }
+        else{
+            System.out.println("A DRAW HAS OCCURED! Lives remain the same");
+        }
+        displayLives(Alives, Blives);
+        pause = new PAUSE();
+        
+        
+    }
 }
