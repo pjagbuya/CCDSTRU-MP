@@ -83,7 +83,7 @@ public class RULES {
         System.out.println();
         System.out.println("\t9.) Whenever a round ends, there is a chance to have a RANDOM challenge/riddle/question that could help either player to be at an \033[1;32mADVANTAGE\033[0m or \033[1;31mDISADVANTAGE\033[0m");
         System.out.println();
-        System.out.println("\t9.Draws in these random challenges Mean NO WINNERS, NO advantages given, NO disadvantages given.");
+        System.out.println("\t10.) Draws in these random challenges Mean NO WINNERS, NO advantages given, NO disadvantages given.");
         System.out.println();
 
         System.out.println();
